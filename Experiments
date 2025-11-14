@@ -1,0 +1,344 @@
+ Experiment 1: Data Importing, Cleaning, and Transformation using Pandas
+ import pandas as pd
+ # Step 1: Import data from a CSV file
+ file_path = 'sales_data.csv'
+ df = pd.read_csv(file_path)
+ # Step 2: Clean the data
+ # Handle missing values in 'customer_id' by removing those rows
+ df.dropna(subset=['customer_id'], inplace=True)
+ # Fill missing 'item_price' with the mean price
+ df['item_price'].fillna(df['item_price'].mean(), inplace=True)
+ # Remove duplicate rows
+ df.drop_duplicates(inplace=True)
+ # Convert 'order_date' to a datetime object
+ df['order_date'] = pd.to_datetime(df['order_date'])
+ # Step 3: Transform the data
+ # Create a new column 'total_price'
+ df['total_price'] = df['item_price'] * df['quantity']
+# Extract the year and month into new columns
+ df['order_year'] = df['order_date'].dt.year
+ df['order_month'] = df['order_date'].dt.month
+ # Summarize data: Find the total sales per month
+ monthly_sales = df.groupby(['order_year', 'order_month'])['total_price'].sum().reset_index()
+ # Step 4: Display the final result
+ print("Cleaned and transformed monthly sales data:")
+ print(monthly_sales)
+
+
+
+ Experiment 2: Descriptive, Predictive, and Prescriptive Analytics overview with sample dataset
+ Discussed in classroom….
+ Experiment 3: Data Visualization using Matplotlib (Bar, Line, Pie, Histogram)
+ import matplotlib.pyplot as plt
+ import numpy as np
+ # --- Bar Chart --
+categories = ['A', 'B', 'C', 'D']
+ values = [25, 40, 30, 55]
+ plt.figure(figsize=(8, 5))
+ plt.bar(categories, values, color='skyblue', edgecolor='black')
+ plt.xlabel('Category')
+ plt.ylabel('Value')
+ plt.title('Simple Bar Chart')
+ plt.grid(axis='y', linestyle='--', alpha=0.7)
+ plt.show()
+# --- Line Chart --
+x_data = np.linspace(0, 10, 100)
+ y_data = np.sin(x_data)
+ plt.figure(figsize=(8, 5))
+ plt.plot(x_data, y_data, color='red', linestyle='-', linewidth=2, marker='o', markersize=4)
+ plt.xlabel('X-axis')
+ plt.ylabel('Y-axis')
+ plt.title('Simple Line Chart (Sine Wave)')
+ plt.grid(True, linestyle='--', alpha=0.6)
+ plt.show()
+ # --- Pie Chart --
+sizes = [30, 25, 15, 30]
+ labels = ['Apples', 'Bananas', 'Cherries', 'Dates']
+ colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue']
+ explode = (0, 0.1, 0, 0)  # Explode the second slice (Bananas)
+ plt.figure(figsize=(7, 7))
+ plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=True, startangle=140)
+ plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+ plt.title('Fruit Distribution Pie Chart')
+ plt.show()
+ # --- Histogram --
+data = np.random.randn(1000)  # Generate 1000 random numbers from a standard normal 
+distribution
+ plt.figure(figsize=(8, 5))
+plt.hist(data, bins=30, color='lightgreen', edgecolor='black', alpha=0.7)
+ plt.xlabel('Value')
+ plt.ylabel('Frequency')
+ plt.title('Histogram of Random Data')
+ plt.grid(axis='y', linestyle='--', alpha=0.7)
+ plt.show()
+ Experiment 4: Exploratory Data Analysis using Seaborn (Correlation, Pairplots, Heatmaps)
+ 1. Preliminaries: Setup and data loading 
+import pandas as pd
+ import seaborn as sns
+ import matplotlib.pyplot as plt
+ # Load the dataset
+ penguins_df = sns.load_dataset('penguins')
+ penguins_df.head()
+ 2. Correlation analysis
+ Correlation is a statistical measure that indicates how two or more variables fluctuate together. 
+A correlation matrix can quantify these relationships, and a heatmap is an excellent tool to 
+visualize it. 
+● Positive correlation (+1): As one variable increases, the other also increases.
+ ● Negative correlation (-1): As one variable increases, the other decreases.
+ ● No correlation (0): No linear relationship exists between the variables. 
+Steps to create a correlation heatmap
+ 1. Calculate the correlation matrix: Use the .corr() method on your DataFrame.
+ 2. Plot the heatmap: Use the seaborn.heatmap() function to visualize the matrix. 
+# Calculate the correlation matrix for numerical columns
+ correlation_matrix = penguins_df.corr(numeric_only=True)
+ # Create the heatmap
+plt.figure(figsize=(10, 8))
+ sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+ plt.title('Correlation Heatmap of Penguin Features')
+ plt.show()
+ Interpretation:
+ ● Color scale: The cmap='coolwarm' option creates a diverging color palette, with "warm" 
+colors (red) for positive correlations and "cool" colors (blue) for negative ones.
+ ● annot=True: Displays the correlation coefficient on each cell of the heatmap for clarity.
+ ● Insights: You can see which variables have the strongest relationships. For example, 
+flipper_length_mm and body_mass_g will likely have a strong positive correlation, which 
+means longer flippers are associated with greater body mass. 
+3. Pairplots
+ A pairplot (or scatter matrix) plots pairwise relationships between numerical variables in a 
+dataset. It is ideal for an initial high-level overview of the data. 
+Components of a pairplot
+ ● Diagonal: Shows the distribution of a single variable, typically as a histogram or a 
+Kernel Density Estimate (KDE) plot.
+ ● Off-diagonal: Displays scatterplots showing the relationship between two different 
+variables. 
+●
+ Steps to create a pairplot
+ 1. Call seaborn.pairplot(): Pass your DataFrame to the function.
+ 2. Add a hue parameter: To color-code points based on a categorical variable (e.g., 
+species), use the hue parameter. 
+# Create a basic pairplot
+ sns.pairplot(penguins_df)
+ plt.suptitle('Pairplot of Penguin Features', y=1.02)
+ plt.show()
+ # Create a pairplot with hue for the 'species' variable
+ sns.pairplot(penguins_df, hue='species')
+plt.suptitle('Pairplot of Penguin Features by Species', y=1.02)
+ plt.show()
+ Experiment 5: Hypothesis Testing using Python (t-test, Chi-square, ANOVA)
+ T-test
+ T-tests are used to compare the means of two groups. 
+from scipy import stats
+ import numpy as np
+ # Independent Samples T-test
+ group1 = np.array([85, 90, 88, 91, 87])
+ group2 = np.array([78, 82, 79, 85, 80])
+ t_statistic_ind, p_value_ind = stats.ttest_ind(group1, group2)
+ print(f"Independent T-test: T-statistic = {t_statistic_ind:.2f}, P-value = {p_value_ind:.3f}")
+ # Paired Samples T-test
+ before_treatment = np.array([70, 72, 75, 68, 71])
+ after_treatment = np.array([75, 78, 80, 72, 76])
+ t_statistic_pair, p_value_pair = stats.ttest_rel(before_treatment, after_treatment)
+ print(f"Paired T-test: T-statistic = {t_statistic_pair:.2f}, P-value = {p_value_pair:.3f}")
+ # One-sample T-test
+ sample_scores = np.array([85, 90, 88, 91, 87])
+ population_mean = 80
+ t_statistic_one, p_value_one = stats.ttest_1samp(sample_scores, population_mean)
+ print(f"One-sample T-test: T-statistic = {t_statistic_one:.2f}, P-value = {p_value_one:.3f}")
+ Chi-square Test
+ The Chi-square test is used to examine the relationship between two categorical 
+variables.
+from scipy.stats import chi2_contingency
+ import pandas as pd
+ # Create a contingency table
+ data = {'Gender': ['Male', 'Female', 'Male', 'Female', 'Male'],
+        'Preference': ['A', 'B', 'A', 'A', 'B']}
+ df = pd.DataFrame(data)
+ contingency_table = pd.crosstab(df['Gender'], df['Preference'])
+ chi2, p_value, dof, expected = chi2_contingency(contingency_table)
+ print(f"Chi-square Test: Chi2 = {chi2:.2f}, P-value = {p_value:.3f}")
+ ANOVA (Analysis of Variance)
+ ANOVA is used to compare the means of three or more groups.
+ from scipy.stats import f_oneway
+ import numpy as np
+ group_a = np.array([65, 70, 72, 68, 75])
+ group_b = np.array([70, 75, 78, 72, 80])
+ group_c = np.array([60, 62, 65, 63, 68])
+ f_statistic, p_value = f_oneway(group_a, group_b, group_c)
+ print(f"ANOVA Test: F-statistic = {f_statistic:.2f}, P-value = {p_value:.3f}")
+ Experiment 6: Regression Analysis (Linear & Logistic) for Sales Forecasting and Customer 
+Churn
+ https://www.kaggle.com/code/bhartiprasad17/customer-churn-prediction
+ Experiment 7: K-Means and Hierarchical Clustering for Market Segmentation
+K-Means and Hierarchical Clustering are two popular unsupervised machine learning algorithms 
+used for market segmentation in Python. They group customers into distinct segments based on 
+shared characteristics, allowing businesses to tailor marketing strategies.
+ K-Means Clustering:
+ Import Libraries.
+  import pandas as pd
+    from sklearn.cluster import KMeans
+    from sklearn.preprocessing import StandardScaler
+    import matplotlib.pyplot as plt
+ Load and Preprocess Data.
+    # Load your customer data (e.g., from a CSV)
+    data = pd.read_csv('customer_data.csv')
+    # Select features for clustering (e.g., 'Annual Income', 'Spending Score')
+    X = data[['Annual Income (k$)', 'Spending Score (1-100)']]
+    # Scale the data for better performance
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+ Determine Optimal Number of Clusters (K):
+ ● Elbow Method: Plot the Within-Cluster Sum of Squares (WCSS) for different values of 
+K and identify the "elbow" point where the decrease in WCSS slows down significantly.
+    wcss = []
+    for i in range(1, 11):
+        kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42, n_init=10)
+        kmeans.fit(X_scaled)
+        wcss.append(kmeans.inertia_) # inertia is WCSS
+    plt.plot(range(1, 11), wcss)
+    plt.title('Elbow Method')
+    plt.xlabel('Number of clusters')
+    plt.ylabel('WCSS')
+    plt.show()
+ Apply K-Means Clustering.
+  # Choose optimal K from the elbow method (e.g., k=4)
+    kmeans = KMeans(n_clusters=4, init='k-means++', random_state=42, n_init=10)
+    clusters = kmeans.fit_predict(X_scaled)
+    data['Cluster'] = clusters # Add cluster assignments to original data
+ Hierarchical Clustering:
+ Import Libraries.
+    import pandas as pd
+    import scipy.cluster.hierarchy as shc
+    from sklearn.preprocessing import StandardScaler
+    import matplotlib.pyplot as plt
+ Load and Preprocess Data: (Same as K-Means)
+ Create Dendrogram:
+    plt.figure(figsize=(10, 7))
+    plt.title("Dendrograms")
+    dend = shc.dendrogram(shc.linkage(X_scaled, method='ward')) # 'ward' minimizes variance 
+within clusters
+    plt.show()
+ ● The dendrogram visually represents the hierarchical clustering, allowing you to 
+determine the number of clusters by observing where a horizontal line can cut through 
+the largest vertical distance without intersecting any clusters.
+ Apply Hierarchical Clustering.
+    from sklearn.cluster import AgglomerativeClustering
+    # Choose optimal number of clusters from the dendrogram (e.g., 4)
+    hc = AgglomerativeClustering(n_clusters=4, affinity='euclidean', linkage='ward')
+    clusters = hc.fit_predict(X_scaled)
+    data['Cluster'] = clusters # Add cluster assignments to original data
+ Experiment 8: Decision Tree and Random Forest for Customer Classification
+ 1. Decision Tree Classifier:
+ A Decision Tree works by recursively splitting the data based on features to create a tree-like 
+structure. Each internal node represents a test on an attribute, each branch represents the 
+outcome of the test, and each leaf node represents a class label.
+ from sklearn.tree import DecisionTreeClassifier
+ from sklearn.model_selection import train_test_split
+ from sklearn.metrics import classification_report, accuracy_score
+ import pandas as pd
+ # Load or create your customer data
+ # Example: df = pd.read_csv('customer_data.csv')
+ # Assuming 'features' are your independent variables and 'target' is your customer class
+ data = {
+    'age': [25, 30, 35, 40, 45, 50, 28, 33, 38, 43],
+    'income': [50000, 60000, 70000, 80000, 90000, 100000, 55000, 65000, 75000, 85000],
+    'purchases_per_month': [2, 3, 4, 5, 6, 7, 3, 4, 5, 6],
+    'customer_class': ['A', 'B', 'A', 'C', 'B', 'A', 'B', 'C', 'A', 'B']
+ }
+df = pd.DataFrame(data)
+ X = df[['age', 'income', 'purchases_per_month']]
+ y = df['customer_class']
+ # Split data into training and testing sets
+ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+ # Create a Decision Tree Classifier
+ dt_classifier = DecisionTreeClassifier(random_state=42)
+ # Train the model
+ dt_classifier.fit(X_train, y_train)
+ # Make predictions
+ y_pred_dt = dt_classifier.predict(X_test)
+ # Evaluate the model
+ print("Decision Tree Classifier Evaluation:")
+ print(f"Accuracy: {accuracy_score(y_test, y_pred_dt):.2f}")
+ print(classification_report(y_test, y_pred_dt))
+ 2. Random Forest Classifier:
+ Random Forest is an ensemble learning method that builds multiple Decision Trees and 
+combines their predictions (e.g., through voting for classification) to improve accuracy and 
+reduce overfitting.
+from sklearn.ensemble import RandomForestClassifier
+ # Using the same data split from the Decision Tree example
+ # Create a Random Forest Classifier
+ rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42) # n_estimators is 
+the number of trees
+ # Train the model
+ rf_classifier.fit(X_train, y_train)
+ # Make predictions
+ y_pred_rf = rf_classifier.predict(X_test)
+ # Evaluate the model
+ print("\nRandom Forest Classifier Evaluation:")
+ print(f"Accuracy: {accuracy_score(y_test, y_pred_rf):.2f}")
+ print(classification_report(y_test, y_pred_rf))
+ Experiment 9: Data Wrangling and Cleaning using Pandas and NumPy
+ Data wrangling and cleaning using Pandas and NumPy are fundamental processes in data 
+analysis and machine learning workflows, ensuring data quality and preparing it for further 
+processing.
+ Pandas for Data Wrangling and Cleaning:
+ Pandas, built on top of NumPy, provides high-level data structures like DataFrames and Series, 
+which are ideal for tabular and time-series data. Key operations include: handling missing 
+values.
+    import pandas as pd
+    import numpy as np
+    df = pd.DataFrame({'A': [1, 2, np.nan], 'B': [4, np.nan, 6]})
+    # Fill missing values with a specific value (e.g., 0)
+    df_filled = df.fillna(0)
+    # Drop rows with any missing values
+    df_dropped_rows = df.dropna()
+    # Drop columns with any missing values
+    df_dropped_cols = df.dropna(axis=1)
+ removing duplicates.
+    df_duplicates = pd.DataFrame({'A': [1, 1, 2], 'B': ['x', 'x', 'y']})
+    df_no_duplicates = df_duplicates.drop_duplicates()
+ Correcting Inconsistent Data.
+   df_inconsistent = pd.DataFrame({'Category': ['Apple', 'apple', 'Orange']})
+    df_inconsistent['Category'] = df_inconsistent['Category'].str.lower()
+ Changing Data Types.
+ df_types = pd.DataFrame({'Value': ['1', '2', '3']})
+    df_types['Value'] = df_types['Value'].astype(int)
+ Reshaping Data.
+    df_pivot = pd.DataFrame({'Date': ['2023-01-01', '2023-01-01'], 'Item': ['A', 'B'], 'Value': [10, 
+20]})
+    df_pivoted = df_pivot.pivot(index='Date', columns='Item', values='Value')
+ NumPy for Numerical Operations:
+ NumPy provides powerful tools for numerical computations, particularly with multi-dimensional 
+arrays, which underpins Pandas. It is used for:
+ Array Manipulation: Slicing, reshaping, and concatenating arrays.
+    import numpy as np
+    arr = np.array([[1, 2], [3, 4]])
+    sliced_arr = arr[0, :]
+    reshaped_arr = arr.reshape(4, 1)
+ Mathematical Operations: Element-wise operations, aggregations (mean, sum, std), and linear 
+algebra.
+    mean_value = np.mean(arr)
+    sum_values = np.sum(arr)
+ Generating Data: Creating arrays with specific values or random numbers.
+    zeros_array = np.zeros((2, 3))
+    random_array = np.random.rand(3, 3)
+ By combining the high-level data manipulation capabilities of Pandas with the efficient numerical 
+operations of NumPy, data analysts and scientists can effectively clean, transform, and prepare 
+datasets for robust analysis and model building.
+ Experiment 10: Automated Report Generation using Python and Matplotlib
+ import matplotlib.pyplot as plt
+ import pandas as pd
+ # Sample data
+ data = {'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        'Sales': [100, 120, 150, 130, 180]}
+ df = pd.DataFrame(data)
+ # Create a line plot
+ plt.figure(figsize=(8, 5))
+ plt.plot(df['Month'], df['Sales'], marker='o')
+ plt.title('Monthly Sales Performance')
+ plt.xlabel('Month')
+plt.ylabel('Sales')
+ plt.grid(True)
+ # Save the plot as an image
+ plt.savefig('sales_performance.png')
+ plt.close() # Close the plot to free up memor
